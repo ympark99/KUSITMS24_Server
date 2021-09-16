@@ -23,10 +23,10 @@
               <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/write.html">Write</a>
+              <a class="nav-link" href="/write">Write</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="#">Beta</a>
+                <a class="nav-link" href="/beta">Beta</a>
               </li>
           </ul>
           <form class="form-inline my-2 my-lg-0">
@@ -37,18 +37,19 @@
       </nav>
 
       <!-- 폼 -->
-      <form>
-        <div class="form-group">
-          <label for="exampleFormControlInput1">오늘의 할일</label>
-          <input type="email" class="form-control" id="exampleFormControlInput1" placeholder="TODO">
-        </div>
-        <div class="form-group">
-          <label for="exampleFormControlTextarea1">세부 내용</label>
-          <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" placeholder="자세하게 입력합시다!"></textarea>
-        </div>
-      </form>
-
-      <button type="button" class="btn btn-light">저장하기</button>
+      <div>
+        <form action="/add" method = "POST">
+          <div class="form-group">
+            <label for="exampleFormControlInput1">오늘의 할일</label>
+            <input type="text" name="title" class="form-control" id="exampleFormControlInput1" placeholder="TODO">
+          </div>
+          <div class="form-group">
+            <label for="exampleFormControlTextarea1">Due date</label>
+            <input type="text" class="form-control" name="date" id="exampleFormControlTextarea1" rows="3" placeholder="Date"></input>
+          </div>
+          <button type="submit" class="btn btn-light">저장하기</button>
+        </form>
+    </div>
 
     <!-- Optional JavaScript; choose one of the two! -->
 
