@@ -4,6 +4,7 @@ const app = express();
 //body parser 설정
 const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({extended : true}));
+app.set('view engine', 'ejs');
 
 require("dotenv").config();
 
@@ -33,6 +34,14 @@ app.get('/write', function(req, res){
 app.get('/beta', function(req, res){
     res.send('베타 페이지입니다.');
 });
+
+app.get('/list', function(req, res){
+    db.collection('post').find().toArray(function(err, result){
+        if(err) console.log(err);
+        console.log(result);
+        res.render('list.ejs',{ posts : result });
+    });
+})
 
 // data 저장
 app.post('/add', function(req, res){
