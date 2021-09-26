@@ -37,7 +37,7 @@ app.get('/beta', function(req, res){
 
 app.get('/list', function(req, res){
     db.collection('post').find().toArray(function(err, result){
-        if(err) console.log(err);
+        if(err) return console.log(err);
         console.log(result);
         res.render('list.ejs',{ posts : result });
     });
@@ -54,9 +54,12 @@ app.post('/add', function(req, res){
         // 데이터 저장 -> 저장시 _id 꼭 적어야함
         db.collection('post').insertOne({_id : allPosts + 1, title : req.body.title, date : req.body.date}, function(err, result){
             if(err) return console.log(err);
-            console.log('추가 완료');
+            console.log('db에 저장 완료');
+            // counter의 totalPost 1 증가시킴(게시물개수)
+            // $set : 바꿀 값, $inc : 더해줄 값
+            db.collection('counter').updateOne({name : '게시물개수'},{ $inc : {totalPost : 1}},function(err, result){
+                if(err) return console.log(err);
+            });
         });
-
-        // counter의 totalPost 1 증가시킴(게시물개수)
     });
 });
