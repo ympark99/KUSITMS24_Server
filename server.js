@@ -45,9 +45,18 @@ app.get('/list', function(req, res){
 
 // data 저장
 app.post('/add', function(req, res){
-    // 데이터 저장 -> 저장시 _id 꼭 적어야함
-    db.collection('post').insertOne({_id : Math.random() * 1e16, title : req.body.title, date : req.body.date}, function(err, result){
+    res.send('전송 완료');
+    db.collection('counter').findOne({name : '게시물개수'}, function(err, result){
         if(err) return console.log(err);
-        console.log('추가 완료');
+        console.log(result.totalPost);
+        var allPosts = result.totalPost;
+
+        // 데이터 저장 -> 저장시 _id 꼭 적어야함
+        db.collection('post').insertOne({_id : allPosts + 1, title : req.body.title, date : req.body.date}, function(err, result){
+            if(err) return console.log(err);
+            console.log('추가 완료');
+        });
+
+        // counter의 totalPost 1 증가시킴(게시물개수)
     });
 });
