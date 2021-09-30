@@ -58,17 +58,19 @@
         $('.delete').click(function(e){
           // data-id 가져오기
           var num = e.target.dataset.id;
-
+          var clickButton = $(this);
           $.ajax({
             method : 'DELETE',
             url : '/delete',
             data : { _id : num }
-          }).done(function(result){});
-        })
-
-        
+          }).done(function(result){
+            //화면 서서히 사라짐
+            clickButton.parent('li').fadeOut();
+          }).fail(function(xhr, textStatus, errorThrown){
+            console.log(xhr, textStatus, errorThrown);
+          });
+        })        
       </script>
-
 
     <!-- Optional JavaScript; choose one of the two! -->
 

@@ -71,6 +71,10 @@ app.delete('/delete', function(req, res){
     db.collection('post').deleteOne(req.body, function(err, result){
         if(err) return console.log(err);
         console.log('삭제 완료');
+        res.status(200).send({ message : 'success' });
+        // 전체 개수 -1
+        db.collection('counter').updateOne({name : '게시물개수'},{ $inc : {totalPost : -1}},function(err, result){
+            if(err) return console.log(err);
+        });        
     })
-    res.send('삭제완료');
 })
