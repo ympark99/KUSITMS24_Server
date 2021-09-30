@@ -66,4 +66,11 @@ app.post('/add', function(req, res){
 
 app.delete('/delete', function(req, res){
     console.log(req.body);
+    // 숫자로 변환
+    req.body._id = parseInt(req.body._id);    
+    db.collection('post').deleteOne(req.body, function(err, result){
+        if(err) return console.log(err);
+        console.log('삭제 완료');
+    })
+    res.send('삭제완료');
 })
