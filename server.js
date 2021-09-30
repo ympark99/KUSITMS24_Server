@@ -63,3 +63,7 @@ app.post('/add', function(req, res){
         });
     });
 });
+
+app.delete('/delete', function(req, res){
+    console.log(req.body);
+})
