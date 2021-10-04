@@ -78,3 +78,11 @@ app.delete('/delete', function(req, res){
         });        
     })
 })
+
+// :id -> 각 id별 페이지 파라미터
+app.get('/detail/:id', function(req, res){
+    db.collection('post').findOne({_id : parseInt(req.params.id)}, function(err, result){
+        if(err) return console.log(err);
+        res.render('detail.ejs', { data : result });
+    })
+})
