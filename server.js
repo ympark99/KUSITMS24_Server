@@ -5,6 +5,7 @@ const app = express();
 const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({extended : true}));
 app.set('view engine', 'ejs');
+app.use('/public', express.static(('public'))); // 미들웨어-> public 사용 선언
 
 require("dotenv").config();
 
@@ -24,11 +25,11 @@ MongoClient.connect( connectUrl ,{ useUnifiedTopology : true },function(err, cli
 
 
 app.get('/', function(req, res){
-    res.sendFile(__dirname + '/index.html');
+    res.render('index.ejs');
 });
 
 app.get('/write', function(req, res){
-    res.sendFile(__dirname + '/write.html');
+    res.render('write.ejs');
 });
 
 app.get('/beta', function(req, res){
