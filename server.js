@@ -4,9 +4,11 @@ const app = express();
 //body parser 설정
 const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({extended : true}));
-app.set('view engine', 'ejs');
 app.use('/public', express.static(('public'))); // 미들웨어-> public 사용 선언
+const methodOverride = require('method-override') // put 사용
+app.use(methodOverride('_method'))
 
+app.set('view engine', 'ejs');
 require("dotenv").config();
 
 // mongodb 연결
@@ -46,7 +48,7 @@ app.get('/list', function(req, res){
 
 // data 저장
 app.post('/add', function(req, res){
-    res.send('전송 완료');
+    //  res.send('전송 완료');
     db.collection('counter').findOne({name : '게시물개수'}, function(err, result){
         if(err) return console.log(err);
         console.log(result.totalPost);
@@ -61,6 +63,7 @@ app.post('/add', function(req, res){
             db.collection('counter').updateOne({name : '게시물개수'},{ $inc : {totalPost : 1}},function(err, result){
                 if(err) return console.log(err);
             });
+            res.redirect('/list');
         });
     });
 });
@@ -85,5 +88,20 @@ app.get('/detail/:id', function(req, res){
     db.collection('post').findOne({_id : parseInt(req.params.id)}, function(err, result){
         if(err) return console.log(err);
         res.render('detail.ejs', { data : result });
+    })
+})
+
+app.get('/edit/:id', function(req, res){
+    db.collection('post').findOne({_id : parseInt(req.params.id)}, function(err, result){
+        if(err) return console.log(err);
+        res.render('edit.ejs', { post : result });
+    })
+})
+
+// 수정 기능
+app.put('/edit', function(req, res){
+    db.collection('post').updateOne({ _id : parseInt(req.body.id) },{ $set : { title : req.body.title, date : req.body.date} }, function(err, result){
+        console.log('수정완료');
+        res.redirect('/list');
     })
 })
