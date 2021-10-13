@@ -105,3 +105,42 @@ app.put('/edit', function(req, res){
         res.redirect('/list');
     })
 })
+
+// 로그인
+const passport = require('passport');
+const LocalStrategy = require('passport-local').Strategy;
+const session = require('express-session');
+
+// 미들웨어 설정
+app.use(session({ secret : '비밀코드', resave : true, saveUninitialized : false}));
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.get('/login', function(req, res){
+    res.render('login.ejs');
+})
+
+app.post('/login', passport.authenticate('local', {
+    failureRedirect : '/fail'
+}), function(req, res){
+    res.redirect('/');
+})
+
+passport.use(new LocalStrategy({
+    usernameField: 'id',
+    passwordField: 'pw',
+    session: true,
+    passReqToCallback: false,
+}, function (inputId, inputPw, done) {
+    //console.log(inputId, inputPw);
+    db.collection('login').findOne({ id: inputId }, function (err, result) {
+        if (err) return done(err)
+    
+        if (!result) return done(null, false, { message: 'ID is not found' })
+        if (inputPw == result.pw) {
+            return done(null, result)
+        } else {
+            return done(null, false, { message: 'Password incorrect' })
+        }
+        })
+}));
