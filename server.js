@@ -134,13 +134,22 @@ passport.use(new LocalStrategy({
 }, function (inputId, inputPw, done) {
     //console.log(inputId, inputPw);
     db.collection('login').findOne({ id: inputId }, function (err, result) {
-        if (err) return done(err)
+        if (err) return done(err);
     
-        if (!result) return done(null, false, { message: 'ID is not found' })
+        if (!result) return done(null, false, { message: 'ID is not found' });
         if (inputPw == result.pw) {
-            return done(null, result)
+            return done(null, result); // serializeUser의 user로 들어감
         } else {
-            return done(null, false, { message: 'Password incorrect' })
+            return done(null, false, { message: 'Password incorrect' });
         }
         })
 }));
+
+// session 저장(로그인 성공시), id 이용
+passport.serializeUser(function(user, done){
+    done(null, user.id); // 세션 정보 쿠키로 보냄
+})
+// 세션 데이터 가진 사람 db에서 찾음
+passport.deserializeUser(function(id, done){
+    done(null, {});
+})
