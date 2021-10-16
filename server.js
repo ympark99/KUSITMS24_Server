@@ -118,13 +118,26 @@ app.use(passport.session());
 
 app.get('/login', function(req, res){
     res.render('login.ejs');
-})
+});
 
 app.post('/login', passport.authenticate('local', {
     failureRedirect : '/fail'
 }), function(req, res){
     res.redirect('/');
-})
+});
+
+// isLogin 미들웨어
+app.get('/mypage', isLogin, function(req, res){
+    // req.user에 사용자 정보 담겨있음
+    console.log(req.user);
+    res.render('mypage.ejs', {user : req.user});
+});
+
+// 로그인 검사
+function isLogin(req, res, next){
+    if(req.user) next(); // 로그인시 req.user는 반드시 있음
+    else res.send('로그인이 필요합니다.');
+}
 
 passport.use(new LocalStrategy({
     usernameField: 'id',
@@ -148,8 +161,12 @@ passport.use(new LocalStrategy({
 // session 저장(로그인 성공시), id 이용
 passport.serializeUser(function(user, done){
     done(null, user.id); // 세션 정보 쿠키로 보냄
-})
-// 세션 데이터 가진 사람 db에서 찾음
-passport.deserializeUser(function(id, done){
-    done(null, {});
-})
+});
+
+// 세션 데이터 가진 사람 개인정보 db에서 찾음
+passport.deserializeUser(function(userId, done){
+    // db에서 user.id로 유저를 찾은 뒤에 유저 정보를 아래에 넣음
+    db.collection('login').findOne({id : userId}, function(err, result){
+        done(null, result);
+    })
+});
