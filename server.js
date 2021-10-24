@@ -49,9 +49,38 @@ app.get('/list', function(req, res){
 // 검색
 app.get('/search', (req, res) => {
     //console.log(req.query.value);
-    db.collection('post').find({ title : req.query.value }).toArray(function(err, result){
+    //db.collection('post').find({ title : req.query.value }).toArray(function(err, result){
+    /*
+    // text index로 빠른검색, or 검색 기능, -로 제외 가능(구글 검색 기능)
+    db.collection('post').find({ $text: { $search : req.query.value } }).toArray(function(err, result){        
         console.log(result);
         res.render('search.ejs', { posts : result });
+    });
+    */
+   //aggregate(검색조건 여러개 가능)
+   var condition = [
+    {
+      $search: {
+        index: 'titleSearch',
+        text: {
+          query: req.query.value,
+          path: 'title'  // 제목날짜 둘다 찾고 싶으면 ['title', 'date']
+        }
+      }
+    },
+    /*
+    // 정렬 -1은 역순
+    { $sort : { _id : 1 }},
+    // 상위 10개만
+    { $limit : 10 }    
+    */
+   // 0은 안가져옴, score은 몽고디비에서 자체 스코어순
+   // { $project : { title : 1, _id : 0, score : { $meta : "searchScore " }}}
+    
+  ];
+   db.collection('post').aggregate(condition).toArray(function(err, result){        
+    console.log(result);
+    res.render('search.ejs', { posts : result });
     });
 })
 
