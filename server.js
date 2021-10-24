@@ -84,43 +84,6 @@ app.get('/search', (req, res) => {
     });
 })
 
-// data 저장
-app.post('/add', function(req, res){
-    //  res.send('전송 완료');
-    db.collection('counter').findOne({name : '게시물개수'}, function(err, result){
-        if(err) return console.log(err);
-        console.log(result.totalPost);
-        var allPosts = result.totalPost;
-
-        // 데이터 저장 -> 저장시 _id 꼭 적어야함
-        db.collection('post').insertOne({_id : allPosts + 1, title : req.body.title, date : req.body.date}, function(err, result){
-            if(err) return console.log(err);
-            console.log('db에 저장 완료');
-            // counter의 totalPost 1 증가시킴(게시물개수)
-            // $set : 바꿀 값, $inc : 더해줄 값
-            db.collection('counter').updateOne({name : '게시물개수'},{ $inc : {totalPost : 1}},function(err, result){
-                if(err) return console.log(err);
-            });
-            res.redirect('/list');
-        });
-    });
-});
-
-app.delete('/delete', function(req, res){
-    console.log(req.body);
-    // 숫자로 변환
-    req.body._id = parseInt(req.body._id);    
-    db.collection('post').deleteOne(req.body, function(err, result){
-        if(err) return console.log(err);
-        console.log('삭제 완료');
-        res.status(200).send({ message : 'success' });
-        // 전체 개수 -1
-        db.collection('counter').updateOne({name : '게시물개수'},{ $inc : {totalPost : -1}},function(err, result){
-            if(err) return console.log(err);
-        });        
-    })
-})
-
 // :id -> 각 id별 페이지 파라미터
 app.get('/detail/:id', function(req, res){
     db.collection('post').findOne({_id : parseInt(req.params.id)}, function(err, result){
@@ -206,5 +169,53 @@ passport.deserializeUser(function(userId, done){
     // db에서 user.id로 유저를 찾은 뒤에 유저 정보를 아래에 넣음
     db.collection('login').findOne({id : userId}, function(err, result){
         done(null, result);
+    })
+});
+
+app.post('/register', function(req, res){
+    db.collection('login').insertOne( { id : req.body.id, pw : req.body.pw }, function(err, result){
+        res.redirect('/');
+    } )
+});
+
+// data 저장
+app.post('/add', function(req, res){
+    //  res.send('전송 완료');
+    db.collection('counter').findOne({name : '게시물개수'}, function(err, result){
+        if(err) return console.log(err);
+        console.log(result.totalPost);
+        var allPosts = result.totalPost;
+
+        //var saveData = { _id : allPosts + 1, writer : req.user._id, title : req.body.title, date : req.body.date};
+
+        // 데이터 저장 -> 저장시 _id 꼭 적어야함
+        db.collection('post').insertOne({_id : allPosts + 1, writer : req.user._id, title : req.body.title, date : req.body.date}, function(err, result){
+            if(err) return console.log(err);
+            console.log('db에 저장 완료');
+            // counter의 totalPost 1 증가시킴(게시물개수)
+            // $set : 바꿀 값, $inc : 더해줄 값
+            db.collection('counter').updateOne({name : '게시물개수'},{ $inc : {totalPost : 1}},function(err, result){
+                if(err) return console.log(err);
+            });
+            res.redirect('/list');
+        });
+    });
+});
+
+app.delete('/delete', function(req, res){
+    console.log(req.body);
+    // 숫자로 변환
+    req.body._id = parseInt(req.body._id);    
+
+    var deleteData = { _id : req.body._id, writer : req.user._id }
+
+    db.collection('post').deleteOne(deleteData, function(err, result){
+        if(err) return console.log(err);
+        console.log('삭제 완료');
+        res.status(200).send({ message : 'success' });
+        // 전체 개수 -1
+        db.collection('counter').updateOne({name : '게시물개수'},{ $inc : {totalPost : -1}},function(err, result){
+            if(err) return console.log(err);
+        });        
     })
 });
