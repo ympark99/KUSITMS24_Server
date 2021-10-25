@@ -220,6 +220,33 @@ app.delete('/delete', function(req, res){
     })
 });
 
+let multer = require('multer');
+var storage = multer.diskStorage({
+    destination : function(req, file, cb){
+        cb(null, './public/image');
+    },
+    filename : function(req, file, cb){
+        cb(null, file.originalname); //저장한 이미지 파일 이름 설정,  + 'date' + new Date(), filefilter도 있음 -> 확장자 거르기, limits -> 용량제한
+    }
+})
+
+var upload = multer({storage : storage});
+
+
+app.get('/upload', function(req, res){
+    res.render('upload.ejs');
+});
+
+// multer 미들웨어로 동작, upload.single은 저장, upload.array('profile',10)는 여러개 파일 업로드
+app.post('/upload', upload.single('profile'), function(req, res){
+    res.send('upload complete');
+});
+
+// 이미지 경로로 접속하면 이미지 보여줌
+app.get('/image/:imageName', function(req, res){
+    res.sendFile(__dirname + '/public/image' + req.params.imageName);
+})
+
 // 고객이 /shop경로로 요청했을때 (shop.js 파일을 첨부)미들웨어 적용
 app.use('/shop', require('./routes/shop'));
 
