@@ -219,3 +219,8 @@ app.delete('/delete', function(req, res){
         });        
     })
 });
+
+// 고객이 /shop경로로 요청했을때 (shop.js 파일을 첨부)미들웨어 적용
+app.use('/shop', require('./routes/shop'));
+
+app.use('/board/sub', require('./routes/board/sub'));
